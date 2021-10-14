@@ -1,16 +1,18 @@
-import { SIGNIN, SIGNUP, LOGOUT, REFRESH } from "../types/auth.types";
+import { SIGNIN, SIGNUP, LOGOUT, LOADING } from "../types/auth.types";
 
 const initialState = {
   user: null,
-  accessToken: localStorage.getItem("payload"),
+  accessToken: null,
   isAuth: false,
+  loading: false,
 };
+
 const handlers = {
   DEFAULT: (state) => state,
   [SIGNIN]: signinHandler,
   [SIGNUP]: signupHandler,
   [LOGOUT]: logoutHandler,
-  [REFRESH]: refreshHandler,
+  [LOADING]: (state, action) => ({ ...state, loading: action.isLoading }),
 };
 
 export const authReducer = (state = initialState, action) => {
@@ -25,14 +27,9 @@ function signinHandler(state, action) {
 
 function signupHandler(state, action) {
   const { user, accessToken } = action.payload;
-  return { ...state, user, accessToken };
+  return { ...state, user, accessToken, isAuth: true };
 }
 
 function logoutHandler(state) {
-  return { ...state, user: null, accessToken: null };
-}
-
-function refreshHandler(state, action) {
-  const { user, accessToken } = action.payload;
-  return { ...state, user, accessToken };
+  return { ...state, user: null, accessToken: null, isAuth: false };
 }

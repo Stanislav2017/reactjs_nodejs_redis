@@ -1,23 +1,20 @@
 const AuthService = require("../services/auth.service");
-const { setToken } = require("../services/redis.service");
+const { setToken, removeToken } = require("../services/redis.service");
 
 class AuthController {
   async signup(req, res, next) {
     try {
       const { email, password } = req.body;
-      const userData = await AuthService.signup({ email, password });
-      setToken({
-        userId: userData.user.id,
-        token: userData.accessToken,
-        expirein: 15 * 60,
+      const { user, refreshToken, accessToken } = await AuthService.signup({
+        email,
+        password,
       });
       setToken({
-        userId: userData.user.id,
-        token: userData.refreshToken,
-        type: "refresh.token",
+        userId: user.id,
+        token: refreshToken,
         expirein: 30 * 24 * 60 * 60 * 1000,
       });
-      return res.json(userData);
+      return res.json({ user, accessToken });
     } catch (e) {
       next(e);
     }
@@ -26,20 +23,16 @@ class AuthController {
   async signin(req, res, next) {
     try {
       const { email, password } = req.body;
-      const userData = await AuthService.signin({ email, password });
-      setToken({
-        userId: userData.user.id,
-        token: userData.accessToken,
-        expirein: 15 * 60,
+      const { user, refreshToken, accessToken } = await AuthService.signin({
+        email,
+        password,
       });
       setToken({
-        userId: userData.user.id,
-        token: userData.refreshToken,
-        type: "refresh.token",
+        userId: user.id,
+        token: refreshToken,
         expirein: 30 * 24 * 60 * 60 * 1000,
       });
-
-      return res.json(userData);
+      return res.json({ user, accessToken });
     } catch (e) {
       next(e);
     }
@@ -47,9 +40,9 @@ class AuthController {
 
   async logout(req, res, next) {
     try {
-      const cookies = req.cookies;
-      await UserService.logout(refreshToken);
-      Object.keys(cookies).map((v) => res.clearCookie(v));
+      const { token: refreshToken, userId } = req.payload;
+      await AuthService.logout(refreshToken);
+      removeToken({ userId });
       return res.status(200).send();
     } catch (e) {
       next(e);
@@ -58,20 +51,16 @@ class AuthController {
 
   async refreshToken(req, res, next) {
     try {
-      const { token: refreshToken } = req.payload;
-      const userData = await AuthService.refresh({ refreshToken });
-      setToken({
-        userId: userData.user.id,
-        token: userData.accessToken,
-        expirein: 15 * 60,
+      const { token } = req.payload;
+      const { user, refreshToken, accessToken } = await AuthService.refresh({
+        refreshToken: token,
       });
       setToken({
-        userId: userData.user.id,
-        token: userData.refreshToken,
-        type: "refresh.token",
+        userId: user.id,
+        token: refreshToken,
         expirein: 30 * 24 * 60 * 60 * 1000,
       });
-      return res.json(userData);
+      return res.json({ user, accessToken });
     } catch (e) {
       next(e);
     }
@@ -85,11 +74,6 @@ class AuthController {
     } catch (e) {
       next(e);
     }
-  }
-
-  checkAuth(req, res, next) {
-    const { token, user } = req.payload;
-    return res.json({ user, accessToken: token });
   }
 }
 

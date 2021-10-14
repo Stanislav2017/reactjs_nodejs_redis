@@ -89,7 +89,7 @@ class AuthService {
 
   async logout(data) {
     const { refreshToken } = data;
-    await TokenService.refreshToken(refreshToken);
+    await TokenService.removeToken(refreshToken);
   }
 }
 

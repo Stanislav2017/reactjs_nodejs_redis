@@ -26,9 +26,9 @@ const auth = (req, res, next) => {
   }
 };
 
-const checkAuth = async (req, res, next) => {
+const refreshAuth = async (req, res, next) => {
   try {
-    const { userid: userId, rememberme } = req.headers;
+    const { userid: userId } = req.headers;
     if (!userId) {
       return next(ApiError.UnautorizedError());
     }
@@ -36,36 +36,15 @@ const checkAuth = async (req, res, next) => {
     if (!token) {
       return next(ApiError.UnautorizedError());
     }
-    const user = TokenService.validateAccessToken(token);
-    if (!user) {
-      return next(ApiError.UnautorizedError());
-    }
-    req.payload = { token, user };
-    next();
-  } catch (e) {
-    return next(ApiError.UnautorizedError());
-  }
-};
-
-const refreshAuth = async (req, res, next) => {
-  try {
-    const { userid: userId } = req.headers;
-    if (!userId) {
-      return next(ApiError.UnautorizedError());
-    }
-    const token = await getToken({ userId, type: "refresh.token" });
-    if (!token) {
-      return next(ApiError.UnautorizedError());
-    }
     const user = TokenService.validateRefreshToken(token);
     if (!user) {
       return next(ApiError.UnautorizedError());
     }
-    req.payload = { token };
+    req.payload = { token, userId };
     next();
   } catch (e) {
     return next(ApiError.UnautorizedError());
   }
 };
 
-module.exports = { auth, checkAuth, refreshAuth };
+module.exports = { auth, refreshAuth };

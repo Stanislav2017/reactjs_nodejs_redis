@@ -1,4 +1,4 @@
 export const SIGNIN = "SIGNIN";
 export const SIGNUP = "SIGNUP";
 export const LOGOUT = "LOGOUT";
-export const REFRESH = "REFRESH";
+export const LOADING = "LOADING";

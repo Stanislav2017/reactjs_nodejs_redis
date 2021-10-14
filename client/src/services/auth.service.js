@@ -1,17 +1,23 @@
 import axios from "axios";
-import { logout, signin, signup } from "../store/actions/auth.actions";
-import apiAxiosInstance from "../http/index";
+import { loading, logout, signin, signup } from "../store/actions/auth.actions";
+// import apiAxiosInstance from "../http/index";
 
 const baseURL = "http://localhost:5000/api/auth";
 
 export const autoSigninService = () => {
   return async function (dispatch) {
     try {
-      const resp = await apiAxiosInstance.get("/check_auth");
+      dispatch(loading({ isLoading: true }));
+      const resp = await axios.get(`${baseURL}/refresh_token`, {
+        withCredentials: true,
+        headers: JSON.parse(localStorage.getItem("payload") || {}),
+      });
       const { accessToken, user } = resp.data;
       dispatch(signin({ payload: { accessToken, user } }));
     } catch (e) {
       console.log(e);
+    } finally {
+      dispatch(loading({ isLoading: false }));
     }
   };
 };
@@ -51,7 +57,14 @@ export const signupService = (data) => {
 export const logoutService = () => {
   return async function (dispatch) {
     try {
-      await axios.post(`${baseURL}/logout`);
+      await axios.post(
+        `${baseURL}/logout`,
+        {},
+        {
+          withCredentials: true,
+          headers: JSON.parse(localStorage.getItem("payload") || {}),
+        }
+      );
       localStorage.removeItem("payload");
       dispatch(logout());
     } catch (e) {

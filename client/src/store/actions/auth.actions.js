@@ -1,4 +1,4 @@
-import { LOGOUT, REFRESH, SIGNIN, SIGNUP } from "../types/auth.types";
+import { LOGOUT, SIGNIN, SIGNUP, LOADING } from "../types/auth.types";
 
 export function signin(payload) {
   return { type: SIGNIN, ...payload };
@@ -12,6 +12,6 @@ export function logout() {
   return { type: LOGOUT };
 }
 
-export function refresh() {
-  return { type: REFRESH };
+export function loading(payload) {
+  return { type: LOADING, ...payload };
 }

@@ -1,38 +1,70 @@
-import IndexPage from "../pages/index.page";
-import SigninPage from "../pages/signin.page";
-import SignupPage from "../pages/signup.page";
-import ProductPage from "../pages/product.page";
-import ProductsPage from "../pages/products.page";
+import IndexPage from "../pages/main/index.jsx";
+import SigninPage from "../pages/auth/signin.jsx";
+import SignupPage from "../pages/auth/signup.jsx";
+import BoardsPage from "../pages/boards/boards.jsx";
+import AboutPage from "../pages/about/about.jsx";
+import HelpPage from "../pages/help/help.jsx";
+import {
+  AiOutlineHome,
+  AiOutlineLogin,
+  AiOutlineInfoCircle,
+} from "react-icons/ai";
+
+import { RiArtboardLine } from "react-icons/ri";
+
+import { BiHelpCircle } from "react-icons/bi";
 
 export const routesList = [
   {
-    path: "/",
+    path: "/main",
     component: IndexPage,
     exact: true,
-    roles: ["ROLE_VISITOR"],
+    roles: ["VISITOR"],
+    icon: AiOutlineHome,
+    title: "Home",
   },
   {
     path: "/signin",
     component: SigninPage,
     exact: true,
-    roles: ["ROLE_VISITOR"],
+    roles: ["VISITOR"],
+    icon: AiOutlineLogin,
+    title: "Sign In",
   },
   {
     path: "/signup",
     component: SignupPage,
     exact: true,
-    roles: ["ROLE_VISITOR"],
+    roles: ["VISITOR"],
+    icon: AiOutlineLogin,
+    title: "Sign Up",
   },
   {
-    path: "/product/:id",
-    component: ProductPage,
-    exact: false,
-    roles: ["ROLE_USER"],
-  },
-  {
-    path: "/products",
-    component: ProductsPage,
+    path: "/boards",
+    component: BoardsPage,
     exact: true,
-    roles: ["ROLE_USER"],
+    roles: ["USER"],
+    icon: RiArtboardLine,
+    title: "Boards",
+  },
+  {
+    path: "/about",
+    component: AboutPage,
+    exact: true,
+    roles: ["USER"],
+    icon: AiOutlineInfoCircle,
+    title: "About Page",
+  },
+  {
+    path: "/help",
+    component: HelpPage,
+    exact: true,
+    roles: ["USER"],
+    icon: BiHelpCircle,
+    title: "Help Page",
   },
 ];
+
+export const getRoutList = (role) => {
+  return routesList.filter((v) => v.roles.includes(role));
+};
